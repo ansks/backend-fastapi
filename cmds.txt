@@ -1,0 +1,2 @@
+virtual environment: py -3 -m venv venv
+actiavte virtual environment in terminal:  venv/scripts/activate.bat
