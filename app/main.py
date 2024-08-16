@@ -15,8 +15,9 @@ class Post(BaseModel):
     published: bool = True
     rating: Optional[str] = None
 
-my_posts = [{"title": "black tea benifits", "content": "Antioxident properties", "id": 1}, 
-           {"title": "yellow tea benifits", "content": "oxident properties", "id": 2}]
+my_posts = [
+    {"title": "black tea benifits", "content": "Antioxident properties", "id": 1},
+    {"title": "yellow tea benifits", "content": "oxident properties", "id": 2}]
 
 
 @app.get("/")
@@ -72,3 +73,47 @@ def create_post(post: Post):
     
     
     return {"data": post_dict}
+
+def find_index_post(id_):
+    for i, p in enumerate(my_posts):
+        if p['id'] == id_:
+            return i+1
+    return None
+
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
+    
+    index = find_index_post(id)
+    
+    if index:
+        my_posts.pop(index-1)
+        print(my_posts)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                      detail=f"id: {id} was not found.")
+    
+    
+@app.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
+def update_post(id: int, post: Post):
+    
+    index = find_index_post(id)
+    post_dict = post.model_dump()
+    post_dict['id'] = id
+    
+    if not index:
+        
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail=f"post {id} is not found")
+        
+    else:
+        # my_posts[index-1]["title"] = post.title
+        # my_posts[index-1]["content"] = post.content
+        
+        my_posts[index-1] = post_dict
+        return {"updated": my_posts[index-1]}
+        
+    
+    
+    
+    
