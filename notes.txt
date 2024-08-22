@@ -1,6 +1,40 @@
 1. virtual environment: py -3 -m venv venv <br>
 2. actiavte virtual environment in terminal: source venv/scripts/activate <br>
 3. start app: uvicorn main:app <br>
+4. download postgres - 
+Creds: 
+host: localhost
+username: postgres
+port: 5432
+
+
+brew install postgresql@16
+This formula has created a default database cluster with:
+  initdb --locale=C -E UTF-8 /opt/homebrew/var/postgresql@16
+For more details, read:
+  https://www.postgresql.org/docs/16/app-initdb.html
+
+postgresql@16 is keg-only, which means it was not symlinked into /opt/homebrew,
+because this is an alternate version of another formula.
+
+If you need to have postgresql@16 first in your PATH, run:
+  echo 'export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"' >> ~/.zshrc
+
+For compilers to find postgresql@16 you may need to set:
+  export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
+  export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
+
+To start postgresql@16 now and restart at login:
+  brew services start postgresql@16
+Or, if you don't want/need a background service you can just run:
+  LC_ALL="C" /opt/homebrew/opt/postgresql@16/bin/postgres -D /opt/homebrew/var/postgresql@16
+==> python@3.12
+Python has been installed as
+  /opt/homebrew/bin/python3
+
+Unversioned symlinks `python`, `python-config`, `pip` etc. pointing to
+`python3`, `python3-config`, `pip3` etc., respectively, have been installed into
+  /opt/homebrew/opt/python@3.12/libexec/bin
 
 # Notes:
 ######## CRUD - Create, Read, Update, Delete Operation##########
@@ -74,3 +108,64 @@
 print(say_hello("aSnhul"))
 
 
+# Database: 
+1. you interact with database using DBMS. 
+2. Relational - SQL, NoSQL - MongoDB
+
+
+# While working with Database
+# raw SQL vs ORM (Object relational Mapper)
+ORM - layer of abstraction between database and us 
+Perform all database operation through traditional python code. NO MORE SQL
+e.g. Sqlalchemy
+
+
+Models:
+1. Schema Models/ Pydantic models define structure of the request and response
+
+Client (chrome) --Request---> Schema/Pydantic Model -------------> FastAPI
+Client (chrome) <----- Schema/Pydantic Model <-------Response------ FastAPI
+
+2. SQLAlchemy Model:
+Responsible for defining the columns of our "posts" table within postgres
+Used to query, create, delete and update the columns within database
+
+
+# Authentication:
+1. Session based authentication - Stored in the backend server if user is logged in or logged out
+2. JWT Token - Stateless - no storing of info, stored in  front end if user is logged in or not
+
+JWT Authentication:
+Client --------/login (username + password) ---------> API (if creds are valid sign JWT Token)
+Client <----------------------------- JWT token ------ API
+Client -------- /posts [JWT token] ------------------> API
+Client <------------------------------- data --------- API
+
+
+JWT Token: access_token
+1. Header : algorithm and token type
+{
+  "alg": "HS256",
+  "typ": "JWT"
+}
+2. Payload: data : should not contain any confidential info
+{
+  "user_id": 11,
+  "exp": 1724273487
+}
+3. VERIFY SIGNATURE: signature 
+HMACSHA256(
+  base64UrlEncode(header) + "." +
+  base64UrlEncode(payload),
+  your-256-bit-secret/secret base64 encoded
+) 
+
+
+If an URL needs to be protected then we add extra dependentcy in that URL that they provide access token.
+e.g. /posts/ -> get_current_use: int: Depends(Oauth2.get_current_user)
+
+# Database Relationship primary key and foreign key
+1. One to Many Relationship -> e.g. User Table and Post Table
+
+
+# Adding parameters for specific search

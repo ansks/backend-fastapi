@@ -1,119 +1,27 @@
-from random import randrange
-from typing import Union, Optional
-from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.params import Body
-from pydantic import BaseModel # Defining data schema - validation
-import numpy as np
+from fastapi import FastAPI
+from sqlalchemy.orm import Session
+from . import models
+from .database import engine
+from .routers import user, post, auth
+from .config import settings
 
-app = FastAPI()
+
+app = FastAPI(title = "Social Media App", version="1.1.0")
 # Always keep in mind when structuring your APIs. It runs from top to bottom.
-# Defining Schema for Post
 
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[str] = None
-
-my_posts = [
-    {"title": "black tea benifits", "content": "Antioxident properties", "id": 1},
-    {"title": "yellow tea benifits", "content": "oxident properties", "id": 2}]
+# Creating tables in datebase
+models.Base.metadata.create_all(bind=engine)
 
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
-@app.get("/posts/latest/")
-def get_latest_post():
-    post = my_posts[len(my_posts)-1]
-    return {"detail": post}
+app.include_router(post.router)
+app.include_router(user.router)
+app.include_router(auth.router)
 
-# path parameter
-@app.get("/posts/{id}/")
-def get_posts(id: int, response: Response): 
-    
-    assert type(id) == int
-    post = [entry for entry in my_posts if entry['id'] == id]
-    
-    if not post:
-        # one way
-        # response.status_code = status.HTTP_404_NOT_FOUND
-        # return {"message": f"post with id {id} not found."}
-        # other way
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                      detail=f"post with id {id} not found.")
 
-    return {"post_details": post}
+
     
 
-@app.get("/posts/")
-def get_all_posts():
-    return {"data": my_posts}
-
-# 1. Defining without schema validation
-# @app.post("/create_post/")
-# def create_post(payload: dict = Body(...)):  Method 1:
-    # print(payload)
-    # return {"data": f"title: {payload["title"]}, content: {payload["content"]}"}
-
-# 2. Defining the schema of the input data - This will also do the data validation.
-@app.post("/posts/", status_code=status.HTTP_201_CREATED)
-def create_post(post: Post):    
-    
-    print(post)
-    print(post.dict())
-    print(post.model_dump())
-    # print(f"title: {new_post.title},  content : {new_post.content}")
-    post_dict = post.model_dump()
-    post_dict["id"] = randrange(1, 10000)
-    
-    my_posts.append(post_dict)
-    
-    
-    
-    return {"data": post_dict}
-
-def find_index_post(id_):
-    for i, p in enumerate(my_posts):
-        if p['id'] == id_:
-            return i+1
-    return None
-
-@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int):
-    
-    index = find_index_post(id)
-    
-    if index:
-        my_posts.pop(index-1)
-        print(my_posts)
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                      detail=f"id: {id} was not found.")
-    
-    
-@app.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: Post):
-    
-    index = find_index_post(id)
-    post_dict = post.model_dump()
-    post_dict['id'] = id
-    
-    if not index:
-        
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
-                            detail=f"post {id} is not found")
-        
-    else:
-        # my_posts[index-1]["title"] = post.title
-        # my_posts[index-1]["content"] = post.content
-        
-        my_posts[index-1] = post_dict
-        return {"updated": my_posts[index-1]}
-        
-    
-    
-    
-    
