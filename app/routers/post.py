@@ -1,5 +1,6 @@
 from typing import List, Optional
 from fastapi import Depends, FastAPI, Response, status, HTTPException, APIRouter
+from sqlalchemy import func
 from .. import models, schemas, utils, oauth2
 from ..database import get_db, engine
 from sqlalchemy.orm import Session
@@ -9,7 +10,8 @@ router = APIRouter(
     tags=["Posts"])
 
 
-@router.get("/", response_model = List[schemas.PostResponse])
+# @router.get("/", response_model = List[schemas.PostResponse])
+@router.get("/", response_model = List[schemas.PostVoteResponse])  # After Adding Votes
 def get_all_posts(db: Session = Depends(get_db), 
                   limit: int = 10, # more parameters 
                   skip: int = 0,
@@ -17,13 +19,27 @@ def get_all_posts(db: Session = Depends(get_db),
     
     # cur.execute(""" SELECT * FROM posts """)
     # posts = cur.fetchall()
-    print(search)
-    posts = db.query(models.Post)\
+    # print(search)
+    
+    # posts = db.query(models.Post)\
+    #             .filter(models.Post.title.contains(search))\
+    #             .limit(limit=limit)\
+    #             .offset(offset=skip)\
+    #             .all()
+ 
+    posts = db.query(models.Post, 
+                     func.count(models.Vote.post_id).label('votes'))\
+                .join(target=models.Vote, 
+                      isouter = True,
+                      onclause=models.Post.id==models.Vote.post_id)\
+                .group_by(models.Post.id)\
                 .filter(models.Post.title.contains(search))\
                 .limit(limit=limit)\
                 .offset(offset=skip)\
                 .all()
+                          
                 
+    # print(posts) # to check the actual SQL query, do it without .all()
     
     return posts
 
@@ -52,8 +68,10 @@ def create_post(post: schemas.CreatePost,
     return new_post
 
 
-@router.get("/latest/", status_code=status.HTTP_200_OK, response_model=schemas.PostResponse)
-def get_latest_post(db: Session = Depends(get_db), 
+# @router.get("/latest/", status_code=status.HTTP_200_OK, response_model=schemas.PostResponse)
+@router.get("/latest/", status_code=status.HTTP_200_OK, 
+            response_model=schemas.PostVoteResponse)
+def get_latest_post(db: Session = Depends(get_db),
                     current_user: int = Depends(oauth2.get_current_user)):
     # post = my_posts[len(my_posts)-1]
     
@@ -62,13 +80,24 @@ def get_latest_post(db: Session = Depends(get_db),
     # post = cur.fetchone()
     
     #ORM
-    post = db.query(models.Post).filter(models.Post.owner_id == current_user.id).order_by(models.Post.created_at.desc()).first()
+    # post = db.query(models.Post).filter(models.Post.owner_id == current_user.id).order_by(models.Post.created_at.desc()).first()
     
+    post = db.query(models.Post, 
+                     func.count(models.Vote.post_id).label('votes'))\
+                .join(target=models.Vote, 
+                      isouter = True,
+                      onclause=models.Post.id==models.Vote.post_id)\
+                .group_by(models.Post.id)\
+                .filter(models.Post.owner_id == current_user.id)\
+                .order_by(models.Post.created_at.desc())\
+                .first()
+                
     return post
 
 
 # path parameter
-@router.get("/{id}/", response_model = schemas.PostResponse)
+# @router.get("/{id}/", response_model = schemas.PostResponse)
+@router.get("/{id}/", response_model = schemas.PostVoteResponse)
 # def get_posts(id: int, response: Response): 
 def get_posts(id: int,
               db: Session = Depends(get_db),
@@ -82,7 +111,15 @@ def get_posts(id: int,
     # post = cur.fetchone()
     # print(post)
     
-    post = db.query(models.Post).filter(models.Post.id == id).first()
+    # post = db.query(models.Post).filter(models.Post.id == id).first()
+    post = db.query(models.Post, 
+                     func.count(models.Vote.post_id).label('votes'))\
+                .join(target=models.Vote, 
+                      isouter = True,
+                      onclause=models.Post.id==models.Vote.post_id)\
+                .group_by(models.Post.id)\
+                .filter(models.Post.id == id)\
+                .first()
     
     if not post:
         # one way

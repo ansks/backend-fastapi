@@ -1,3 +1,4 @@
+from httpx import post
 from pydantic import BaseModel, EmailStr, conint
 from typing import Optional
 from datetime import datetime
@@ -40,7 +41,16 @@ class PostResponse(PostBaseModel):
     
     class Config:  # since we are connecting with the database
         from_attributes = True
-        
+    
+class PostVoteResponse(BaseModel):
+    Post: PostResponse
+    votes: int
+    
+    class Config:  # since we are connecting with the database
+        from_attributes = True
+        # orm_mode = True
+    
+    
 class Login(BaseModel):
     email: EmailStr
     password: str
