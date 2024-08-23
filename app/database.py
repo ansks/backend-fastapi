@@ -15,8 +15,7 @@ def manual_setup():
     while True:
         try:
             uri = SQLALCHEMY_DATABASE_URL
-            conn = psycopg.connect(uri, 
-                                row_factory=dict_row)
+            conn = psycopg.connect(uri, row_factory=dict_row)
             cur = conn.cursor()
             logging.info("Database connection established.")
             break

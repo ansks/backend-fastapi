@@ -1,10 +1,11 @@
-from fastapi import Body, Depends
+from fastapi import Body, Depends, FastAPI
 from sqlalchemy.orm import Session
 
 my_posts = [
     {"title": "black tea benifits", "content": "Antioxident properties", "id": 1},
     {"title": "yellow tea benifits", "content": "oxident properties", "id": 2}]
 
+app = FastAPI()
 
 @app.get("/sql_alchemy")
 def test_post_db(db: Session = Depends(get_db)):

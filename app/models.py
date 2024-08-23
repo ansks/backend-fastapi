@@ -25,8 +25,7 @@ class Post(Base):
     #                     nullable = False, 
     #                     default=datetime.now(tz=timezone.utc))
     
-    
-    
+        
 class User(Base): 
     __tablename__ = "users"
     
@@ -36,5 +35,21 @@ class User(Base):
     created_at = Column(TIMESTAMP(timezone=True),
                         nullable = False, 
                         server_default=text('now()'))
+    
+class Vote(Base):
+    __tablename__ = "votes"
+    
+    user_id = Column(Integer, 
+                     ForeignKey(User.id, ondelete="CASCADE"),
+                     primary_key=True)
+    post_id = Column(Integer, 
+                     ForeignKey(Post.id, ondelete="CASCADE"),
+                     primary_key=True)
+    
+    
+    
+    
+    
+    
 
     

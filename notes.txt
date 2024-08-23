@@ -168,4 +168,13 @@ e.g. /posts/ -> get_current_use: int: Depends(Oauth2.get_current_user)
 1. One to Many Relationship -> e.g. User Table and Post Table
 
 
-# Adding parameters for specific search
+# Adding parameters for specific search -> it will be added to url directly
+ket%20anshul -> ket<space>anshul
+
+# Requirement for Voting model:
+- user will be liking the post only once 
+  - user_id and post_id together should be unique -> primary key
+
+
+
+

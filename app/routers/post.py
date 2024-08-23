@@ -17,7 +17,7 @@ def get_all_posts(db: Session = Depends(get_db),
     
     # cur.execute(""" SELECT * FROM posts """)
     # posts = cur.fetchall()
-    
+    print(search)
     posts = db.query(models.Post)\
                 .filter(models.Post.title.contains(search))\
                 .limit(limit=limit)\
@@ -117,7 +117,7 @@ def delete_post(id: int,
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, 
                             detail="Server understood the request but refused to process it")
     
-    delete_post.delete(synchronize_session = False)
+    delete_query.delete(synchronize_session = False)
     db.commit()
     
     
