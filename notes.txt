@@ -174,7 +174,25 @@ ket%20anshul -> ket<space>anshul
 # Database Miogration Tool: Alembic
 - Track changes with database schema and rollback changes at any time.
 
+#Help
+alembic --help
+alembic revision --help
+alembic upgrade --help
+alembic downgrade  --help    etc. 
+
+
+# Initiate 
 alembic init <directory name>
+
+# Revision to start, every revision comes with 
+alembic revision -m "create post table"  # Creating a table
+
+# Add changed in the file added under version e.g. addign table, columns etc.
+alembic upgrade <revision num from revision file> or alembic upgrage head/+1
+
+# check the current head of the database
+alembic current 
+
 
 
 
