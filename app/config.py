@@ -1,14 +1,14 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import ValidationError
 
+# import os
+# os.getenv()  # Get the environment variable directly
+
 class Settings(BaseSettings):
     """It checks in the environment file and from environment. 
     if variable not found then it will throw error. """
     
-    # database_name: str = "localhost"
-    # database_password: str = "267766ks"
-    # secret_key: str = "14w5"
-    
+    # database_name: str = "localhost"    
     # model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
     
     database_hostname: str
