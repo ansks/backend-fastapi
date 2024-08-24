@@ -30,8 +30,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"], # http method , * > wild card
+    allow_headers=["*"], #
 )
 
 
