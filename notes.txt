@@ -211,8 +211,29 @@ web: uvicorn app.main:app --host=0.0.0.0 --port=${PORT:-5000}
 --host=0.0.0.0  > means all addresses 
 --port=${PORT:-5000} > meaning Port value will come fron environment ${} > to Setup environment variable
 
+heroku logs -t
+# Create Postgres DB on heroku 
+# Set up environment variables in Postgres instance and 
+# heroku run <command to run > e.g. heroku run alembic upgrade head # get the latest head and create all postgres tables
+# heroku ps:restart > restart the application
+heroku addons:create heroku-postgresql:<name>
 
 
+# Setup to deploy on ubuntu server
+Host
+ce0lkuo944ch99.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com
+Database
+d1huqe3tqv30f8
+User
+u7lmh0sok3s6l7
+Port
+5432
+Password
+p8b4f4b3bf554339a9b9ba082310a3a9208cc1321cfb1381f03b9a5ceaa6fce50
+URI
+postgres://u7lmh0sok3s6l7:p8b4f4b3bf554339a9b9ba082310a3a9208cc1321cfb1381f03b9a5ceaa6fce50@ce0lkuo944ch99.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com:5432/d1huqe3tqv30f8
+Heroku CLI
+heroku pg:psql postgresql-cubed-55151 --app fastapi-social-media
 
 
 
