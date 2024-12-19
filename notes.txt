@@ -236,5 +236,9 @@ Heroku CLI
 heroku pg:psql postgresql-cubed-55151 --app fastapi-social-media
 
 
-
+; host: ubuntu-s-1vcpu-512mb-10gb-syd1-01
+; c9S#,EtYd&#S27R
+; user with root privilage 
+; su - anshul
+; usermod -aG sudo anshul    -> providing root access
 

@@ -1,0 +1,35 @@
+services:
+  api:
+    image: anshulkumarsingh/fastapi:latest
+    depends_on:
+      - postgres  # depends on to make sure to start the database container first
+    ports:
+      - 80:8000
+    volumes:
+      - ./:/usr/src/app/:ro
+    # env_file:
+    #   - "./.env"
+    environment:
+      - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+    
+    # command: bash -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_USERNAME=${DATABASE_USERNAME}
+
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+  
+volumes:
+  postgres-db:

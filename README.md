@@ -4,3 +4,4 @@
 2. pip install -r requirements.txt
 2. actiavte virtual environment in terminal: source venv/scripts/activate <br>
 3. start app server: uvicorn main:app
+4. pytest <file name> -v -s 
